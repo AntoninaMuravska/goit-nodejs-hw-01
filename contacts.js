@@ -29,14 +29,23 @@ async function getContactById(contactId) {
 
 async function removeContact(contactId) {
   const contacts = await getContacts();
-  const filteredContacts = contacts.filter(({ id }) => id !== contactId);
+  const contactExist = contacts.some(el => el.id === contactId);
 
-  await fs.writeFile(contactsPath, JSON.stringify(filteredContacts));
-  console.log(`Contact removed`);
+  if (contactExist) {
+    const filteredContacts = contacts.filter(({ id }) => id !== contactId);
+
+    await fs.writeFile(contactsPath, JSON.stringify(filteredContacts));
+    console.log(`Contact removed`);
+  }
+  console.log(`Contact with id=${contactId} not found`);
 }
 
 async function addContact(name, email, phone) {
   const contacts = await getContacts();
+  if (!name || !email || !phone) {
+    console.log('Please fill all fields');
+    return;
+  }
 
   contacts.push({
     id: uuidv4(),
